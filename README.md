@@ -5,9 +5,9 @@
 <h3><b>Participantes:</b></h3>
 
 <li>
-  <lu>Haizea Bermejo Pascual</lu>
-  <lu>Marcos Chouciño Grijalbo</lu>
-  <lu>Tserenlkham Undrakh</lu>
+  <ol>Haizea Bermejo Pascual</ol>
+  <ol>Marcos Chouciño Grijalbo</ol>
+  <ol>Tserenlkham Undrakh</ol>
 </li>
 
 
