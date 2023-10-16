@@ -1,0 +1,2 @@
+En la siguiente imagen se puede ver el funcionamiento de LCD_CTRL cuando se prueva la opcion "OP_SETCURSOR".
+Se empieza reseteando la maquina (reset 1) y activando a la vez LCD_INIT_DONE y OP_DRAWCOLOUR, pasandole tambien datos por las señales XCOY e YROW. Como esperabamos, pasa la señal 2A seguido por los datos relevantes, que en este caso es la señal 0002, posterior mente se manda la señal de control 2B y la otra señal relevante 000F. Una vez terminado la operación se activa la señal DONE_CURSOR y se vuelve al estado inicial.
