@@ -95,6 +95,10 @@ process
 --	tb_OP_SETCURSOR	 <= '0';
 
 	--probar cosas op_draw_color
+	--datos
+	tb_NUMPIX <= "00000000000000011";
+	tb_RGB <= "0110101001010110";
+	wait for 50 ns;
 	tb_OP_DRAWCOLOUR	 <= '1';
 	tb_RGB <= "0110101001010110";
 	wait for 50 ns;
