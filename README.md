@@ -8,5 +8,7 @@
 - Marcos Chouciño Grijalbo
 - Tserenlkham Undrakh
 
+Memoria en proceso 
+https://docs.google.com/document/d/1kTNVtPPLr22Dodlgs90TT7Y6StJ2Dxk9-LlczLiqBkQ/edit?usp=drivesdk 
 
 
