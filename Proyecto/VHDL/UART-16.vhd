@@ -1,4 +1,9 @@
 library ieee;
+
+
+
+
+
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
@@ -12,7 +17,7 @@ entity UART16 IS
 
 		--salidas
 		MANDANDO		: out std_logic;
-		DATOS			: out std_logic_vector(15 downto 0);
+		SALIDA			: out std_logic_vector(15 downto 0)
 		
 	);
 end UART16;
@@ -20,28 +25,30 @@ end UART16;
 
 architecture ARCH_UART16 of UART16 is
 
-	type state is (E0,E1,E2,E3,E4,E5,E6,E7);
+	type state is (E0,E1,E2,E3,E4,E5,E6,E7,E8);
 	signal EP,ES: state;
 	--senales internas
 	--Cont_paso
-	signal RESET_CONT_PASO		: std_logic;
+	signal LD_CONT_PASO		: std_logic;
 	signal DEC_CONT_PASO		: std_logic;
+	signal OUT_PASO				: unsigned(4 downto 0);
 	--REG_DESPL
 	signal RESET_DESPL		: std_logic;
 	signal ANADIR			: std_logic;
 	signal DESPLAZAR		: std_logic;
 	signal DATOS			: unsigned(15 downto 0);
 	--CONT_DIFF
-	signal LD_CONT_DIFF		: std_logic;
-	signal DEC_CONT DIFF		: std_logic;
-	signal NAC			: unsigned(15 downto 0);
-	signal DONE_BIT			: std_logic;
+	signal LD_DIFF		: std_logic;
+	signal DEC_DIFF		: std_logic;
+	signal OUT_DIFF			: unsigned(15 downto 0);
+	signal TC_DIFF			: std_logic;
+	--multiflexor 
+	signal NAC				: unsigned(15 downto 0);
+	signal NACMEDIOS		: unsigned(15 downto 0);
+	signal MITAD			: std_logic;
 	
 
 	--HANSAKE
-	signal MANDANDO: std_logic;
-	signal RECIBIDO: std_logic;
-
 begin
 
 --notaaas: velocidad de la uart : inversa de 115200, el tiempo va por ciclos
@@ -49,7 +56,7 @@ begin
 -------------------------------------------------------------------------------------------
 	-- CONTROL UNIT
 -------------------------------------------------------------------------------------------
-	--
+	-- FALTA ENTERO
 	-- Current state Register (State Machine)
 	process (CLK, reset)
 	begin
@@ -59,59 +66,51 @@ begin
 	end process;
 
 	-- Next state generation logic
-	process (EP,DEL_SCREEN,DRAW_FIG,DONE_CURSOR,DONE_COLOUR,TC_DIAG)
+	process (EP,RX,RECIBIDO,TC_DIFF)--OJO, EN ESTE PARENTESIS FALTAN COSAS FIJISIMO
 	begin
   		case EP is
-			when E0 => 	if (DEL_SCREEN='0' and DRAW_FIG='0') then ES <= E0;          	-- |
-	           			elsif (DEL_SCREEN='1') then ES <= E1;         			-- |Initial state
-                   	elsif (DRAW_FIG='1') then ES <= E4; 				-- |
-							else ES <= E0;                                   		-- |
-	       	   			end if;
-			--DEL_SCREEN
-			when E1 => ES <= E2;       
-			when E2 => 	if(DONE_CURSOR='1')then ES <= E3;
-					else ES <= E2; --handsake done_cursor_delScreen
-					end if;
-					         
-			when E3 => 	if(DONE_COLOUR='1')then ES <= E0;
-					else ES <= E3; --handsake done_colour_delScreen 
-					end if;
-                  	--DRAW_FIG
-			when E4 => ES <= E5;                                                    
-			when E5 => ES <= E6;                         
-			when E6 =>	if(DONE_CURSOR='1')then ES <= E7;
-					else ES <= E6; --handsake done_cursor_DRAW_FIG
-					end if;
-			when E7 => 	if(DONE_COLOUR='1' and TC_DIAG='1')then ES <= E0;
-					elsif(DONE_COLOUR='1' and TC_DIAG='0')then ES <= E8; --handsake done_colour_DRAW_FIG
-					else ES <= E7;  
-					end if;     
-			when E8 => ES <= E5;
+			when E0 => 	 ES <= E1;                                   		
+	       	   			
+			--ESPERAR HASTA RECIBIR PRIMER RX
+			when E1 => if(RX='1')then ES <=E2;
+				else ES <=E1; 
+				end if;
+			--TOCA MIRAR PASO PARA VER QUE HACER A CONTINUACION      			
+			when E2 =>if(OUT_PASO="00000")then ES <=E7;
+						elsif (OUT_PASO = "10100") then ES <=E8;
+						elsif (OUT_PASO = "01010"or OUT_PASO = "01001") then ES <=E3;
+						else
+							if (RX = '1') then ES <=E5;
+							else ES <=E4;
+							end if ;
+						end if;
+			when E3 => ES <=E6; 
+			when E4 => ES <=E6; 
+			when E5 => ES <=E6;
+			when E6 => if(TC_DIFF='1')then ES <=E2; end if;
+			when E7 => if(RECIBIDO='1')then ES <=E0; end if;
+			when E8	 => ES <=E6;
   		end case;
 	end process;
 	
 
-	--SENALES LOGICAS
+	--SENALES LOGICAS, TERMINADOcasi leer abajo
 	RESET_DESPL  <= '1' when (EP=E0) else '0';
 	LD_CONT_PASO  <= '1' when (EP=E0) else '0';
-	LD_CONT_DIFF	<= '1' when (EP=E0) else '0';
-	LD_CONT_DIFF <= '1' when (EP=E2) else '0';
+	LD_DIFF	<= '1' when (EP=E2 or EP=E8) else '0';
+	DEC_CONT_PASO	<= '1' when (EP=E5) else '0';
+
 
 	DESPLAZAR <= '1' when (EP=E5 or EP=E4) else '0';
 	ANADIR <= '1' when (EP=E4) else '0';
+	MITAD <= '1' when (EP=E8) else '0';
+	MANDANDO <= '1' when (EP=E7) else '0';
 
+--############################################3
+	-- OJO PIOJO
+--	DEC_CONT_DIFF <= '1' when (EP=E4) else '0'; TENGO QUE MIRAR COMO PONER ESTO 
+--###########################################
 
-	-- Control signals generation logic
-	LD_X <= '1' when (EP=E1 or EP=E4) else '0';
-	LD_Y <= '1' when (EP=E1 or EP=E4) else '0';
-	LD_COLOUR <= '1' when (EP=E1 or EP=E4) else '0';
-	LD_DIAG <= '1' when (EP=E4) else '0';
-	OP_DRAWCOLOUR <= '1' when(EP=E3 or EP=E7) else '0';
-	OP_SETCURSOR <= '1' when(EP=E2 or EP=E6) else '0';	
-	BORRAR_DIAGONAL <= '1' when (EP=E3) else '0'; -- tal vez mejor en E1 o en los dos
-	INC_DIAG <= '1' when (EP=E5) else '0';
-	INC_Y<= '1' when (EP=E8) else '0';
-	INC_X<= '1' when (EP=E8) else '0';
 
 -------------------------------------------------------------------------------------------
 -- PROCESS UNIT
@@ -126,9 +125,9 @@ begin
 	--registro que desplaza los datos 
 	process(CLK,reset)--TODO ENTERO
 	begin
-	if (reset='1') then COLOUR_CODE_OUT <=(others=>'0');
+	if (reset='1') then DATOS <=(others=>'0');
    	elsif rising_edge(CLK) then 
-	     	if (LD_COLOUR='1') then COLOUR_CODE_OUT <= unsigned(COLOUR_CODE);
+	     	if (DESPLAZAR='1') then DATOS <=  DATOS(15 downto 1 ) & ANADIR;
          end if;
 	end if;		  
 	end process;
@@ -138,29 +137,26 @@ begin
 --------------------------------------------
 	process(CLK,reset)
 	begin
-		if (reset='1') then OUT_DIAG<= "11110000"; TC_DIAG<='0'; 
+		if (reset='1') then OUT_PASO<= "00000";
    	elsif rising_edge(CLK) then 
-           	if (INC_DIAG='1') then OUT_DIAG <= OUT_DIAG - 1;
-            elsif (LD_DIAG ='1') then OUT_DIAG <= "11110000";
+           	if (DEC_CONT_PASO='1') then OUT_PASO <= OUT_PASO - 1;
+	            elsif (LD_CONT_PASO ='1') then OUT_PASO <= "10100";
             end if;
-				if(OUT_DIAG="00000000") then TC_DIAG<='1';
-				else TC_DIAG<='0';
-				end if;
 		end if;		  
 	end process;
 
 --------------------------------------------
---REGISTRO CONTADOR_DIFF
+--REGISTRO CONTADOR_DIFF NO ESTA HECHO TENGO QUE CALCULAR LOS TIEMPOS + PREGUNTAR A GONZALO LA IDEA PARA DES SINCRONIZAR
 --------------------------------------------
 	process(CLK,reset)
 	begin
-		if (reset='1') then OUT_DIAG<= "11110000"; TC_DIAG<='0'; 
+		if (reset='1') then OUT_DIFF<= "11110000"; TC_DIFF<='0'; --ESTE NUMERO HAY QUE CAMBIARLO
    	elsif rising_edge(CLK) then 
-           	if (INC_DIAG='1') then OUT_DIAG <= OUT_DIAG - 1;
-            elsif (LD_DIAG ='1') then OUT_DIAG <= "11110000";
+           	if (DEC_DIFF='1') then OUT_DIFF <= OUT_DIFF - 1;
+            elsif (LD_DIFF ='1') then OUT_DIFF <= "11110000";
             end if;
-				if(OUT_DIAG="00000000") then TC_DIAG<='1';
-				else TC_DIAG<='0';
+				if(OUT_DIFF="00000000") then TC_DIFF<='1';--ESTE NUMERO HAY QUE CAMBIARLO
+				else TC_DIFF<='0';
 				end if;
 		end if;		  
 	end process;
@@ -169,5 +165,8 @@ begin
 
 
 
+
+	
+end ARCH_UART16;
 
 	
