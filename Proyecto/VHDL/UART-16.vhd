@@ -1,9 +1,4 @@
 library ieee;
-
-
-
-
-
 use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
@@ -44,7 +39,7 @@ architecture ARCH_UART16 of UART16 is
 	signal TC_DIFF			: std_logic;
 	--multiflexor 
 	signal MITAD			: std_logic;
-	signal A_CARGAR 		: unsigned(15 downto 0);	
+	signal A_CARGAR 		: unsigned(8 downto 0);	
 
 	
 
@@ -150,12 +145,12 @@ begin
 --------------------------------------------
 	process(CLK,reset)
 	begin
-		if (reset='1') then OUT_DIFF<= "0000000" ; TC_DIFF<='0'; --ESTE NUMERO HAY QUE CAMBIARLO
+		if (reset='1') then OUT_DIFF<= "000000000" ; TC_DIFF<='0'; --ESTE NUMERO HAY QUE CAMBIARLO
    	elsif rising_edge(CLK) then 
            	if (DEC_DIFF='1') then OUT_DIFF <= OUT_DIFF - 1;
             elsif (LD_DIFF ='1') then OUT_DIFF <= A_CARGAR;
             end if;
-				if(OUT_DIFF="00000000") then TC_DIFF<='1';--ESTE NUMERO HAY QUE CAMBIARLO
+				if(OUT_DIFF="000000000") then TC_DIFF<='1';--ESTE NUMERO HAY QUE CAMBIARLO
 				else TC_DIFF<='0';
 				end if;
 		end if;		  
@@ -168,8 +163,8 @@ begin
 
 
 
-		A_CARGAR <= "0101010" when (MITAD='1') 	--ESTE NUMERO ES LA MITAD DEL DE ABAJO
-					else "1010101001"; --ESTE NUMERO HAY QUE CAMBIARLO
+		A_CARGAR <= "11010110" when (MITAD='1') 	--(434/2)-1
+					else "110101111"; --434-3
 
 
 
