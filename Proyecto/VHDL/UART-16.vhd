@@ -72,7 +72,7 @@ begin
 			when E0 => 	 ES <= E1;                                   		
 	       	   			
 			--ESPERAR HASTA RECIBIR PRIMER RX
-			when E1 => if(RX='1')then ES <=E2;
+			when E1 => if(RX='0')then ES <=E2;
 				else ES <=E1; 
 				end if;
 			--TOCA MIRAR PASO PARA VER QUE HACER A CONTINUACION      			
