@@ -43,9 +43,9 @@ architecture ARCH_UART16 of UART16 is
 	signal OUT_DIFF			: unsigned(15 downto 0);
 	signal TC_DIFF			: std_logic;
 	--multiflexor 
-	signal NAC				: unsigned(15 downto 0);
-	signal NACMEDIOS		: unsigned(15 downto 0);
 	signal MITAD			: std_logic;
+	signal A_CARGAR 		: unsigned(15 downto 0);	
+
 	
 
 	--HANSAKE
@@ -108,7 +108,7 @@ begin
 
 --############################################3
 	-- OJO PIOJO
---	DEC_CONT_DIFF <= '1' when (EP=E4) else '0'; TENGO QUE MIRAR COMO PONER ESTO 
+	DEC_DIFF <= '1' when (EP=E6 and TC_DIFF = '0') else '0';-- tengo que comprovar si esto esta bien porque no estoy seguro
 --###########################################
 
 
@@ -150,10 +150,10 @@ begin
 --------------------------------------------
 	process(CLK,reset)
 	begin
-		if (reset='1') then OUT_DIFF<= "11110000"; TC_DIFF<='0'; --ESTE NUMERO HAY QUE CAMBIARLO
+		if (reset='1') then OUT_DIFF<= "0000000" ; TC_DIFF<='0'; --ESTE NUMERO HAY QUE CAMBIARLO
    	elsif rising_edge(CLK) then 
            	if (DEC_DIFF='1') then OUT_DIFF <= OUT_DIFF - 1;
-            elsif (LD_DIFF ='1') then OUT_DIFF <= "11110000";
+            elsif (LD_DIFF ='1') then OUT_DIFF <= A_CARGAR;
             end if;
 				if(OUT_DIFF="00000000") then TC_DIFF<='1';--ESTE NUMERO HAY QUE CAMBIARLO
 				else TC_DIFF<='0';
@@ -162,11 +162,18 @@ begin
 	end process;
 
 
+	--------------------------------------------
+--MULTIFLEXOR DE X BITS DE ENTRADA Y DOS POSIBLES VALORES
+--------------------------------------------
+
+
+
+		A_CARGAR <= "0101010" when (MITAD='1') 	--ESTE NUMERO ES LA MITAD DEL DE ABAJO
+					else "1010101001"; --ESTE NUMERO HAY QUE CAMBIARLO
+
 
 
 
 
 	
 end ARCH_UART16;
-
-	
