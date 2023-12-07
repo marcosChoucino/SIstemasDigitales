@@ -3,7 +3,7 @@ use ieee.std_logic_1164.all;
 use ieee.numeric_std.all;
 
 
-entity UART16 IS
+entity UART_16 IS
 	port
 	(	--entradas
 		reset,CLK		: in std_logic;
@@ -21,10 +21,10 @@ entity UART16 IS
 		
 		
 	);
-end UART16;
+end UART_16;
 
 
-architecture ARCH_UART16 of UART16 is
+architecture ARCH_UART16 of UART_16 is
 
 	type state is (E1,E2,E3,E4,E5,E6,E7);
 	signal EP,ES: state;
@@ -61,7 +61,6 @@ begin
 -------------------------------------------------------------------------------------------
 	-- CONTROL UNIT
 -------------------------------------------------------------------------------------------
-	-- FALTA ENTERO
 	-- Current state Register (State Machine)
 	process (CLK, reset)
 	begin
@@ -101,7 +100,7 @@ begin
 	LD_PASO  <= '1' when (EP=E1) else '0';	
 	
 	YMEDIO<= '1' when (EP=E1 and RX = '0') else '0';
-	LD_DIFF <= '1' when (EP=E1 and RX = '0') else '0';
+	--LD_DIFF <=  ESTO ESTA EN EL E6 bien hecho, tiene q estar todo en el mismo
 
 
 	--E2
@@ -110,7 +109,8 @@ begin
 	DESPLAZAR <= '1' when (EP=E5 or EP=E4) else '0';
 	ANADIR <= '1' when (EP=E4) else '0';
 	--E6	
-	LD_DIFF <= '1' when (EP=E6 and TC_DIFF = '1') else '0';
+
+	LD_DIFF <= '1' when ((EP=E6 and TC_DIFF = '1') or (EP=E1 and RX = '0')) else '0';-- borrado temporalmente OJO ES ESENCIAL
 	DEC_PASO <= '1' when (EP=E6 and TC_DIFF = '1') else '0';
 
 
