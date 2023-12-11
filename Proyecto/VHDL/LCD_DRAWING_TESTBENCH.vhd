@@ -128,12 +128,21 @@ process
 	--probar UART
 
 	tb_UART		<='1';
+	tb_EntradaUart	<="0110110001010110";
+
 	wait for 70 ns;
+	tb_UART		<='1';
+	tb_Handsake	<='1';
+
+
+	wait for 70 ns;
+	tb_UART		<='0';
+	tb_UART		<='0';
+
 	tb_DONE_CURSOR 	<='1';
 	wait for 70 ns;
 	tb_DONE_CURSOR 	<='0';
 	tb_UART		<='0';
-	tb_EntradaUart	<="0110110001010110";
 	tb_Handsake	<='1';
 	wait for  100 ns;
 	tb_DONE_COLOUR	<= '1';
