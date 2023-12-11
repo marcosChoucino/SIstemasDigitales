@@ -77,11 +77,10 @@ begin
 	process (EP,DEL_SCREEN,DRAW_FIG,UART,DONE_CURSOR,DONE_COLOUR,TC_DIAG,Handsake,TC_OUT_Y)
 	begin
   		case EP is
-			when E0 => 	if (DEL_SCREEN='0' and DRAW_FIG='0') then ES <= E0;          	-- |
-	           			elsif (DEL_SCREEN='1') then ES <= E1;         			-- |Initial state
-                   			elsif (DRAW_FIG='1') then ES <= E4; 				-- |
-					elsif (UART='1') then ES <= E9; 				-- |
-							else ES <= E0;                                   		-- |
+			when E0 => 	if (DEL_SCREEN='1') then ES <= E1;          	-- |
+	           			elsif (DRAW_FIG='1') then ES <= E4;         			-- |Initial state
+                   		elsif (UART='1') then ES <= E9; 				-- |				-- |
+						else ES <= E0;                                   		-- |
 	       	   			end if;
 			--DEL_SCREEN
 			when E1 => ES <= E2;       
@@ -113,8 +112,8 @@ begin
 					else ES <= E11; --handsake done_cursor_drawfig
 					end if;   
 			when E12=>  if(DONE_COLOUR='0')then ES <= E12;--handsake done_cursor_drawfig
-				    elsif(DONE_COLOUR='1' and TC_DIAG='0')then ES <= E13;
-				    elsif(DONE_COLOUR='1' and TC_DIAG='1' and TC_OUT_Y='0')then ES <= E14;
+				    elsif(TC_DIAG='0')then ES <= E13;
+				    elsif(TC_OUT_Y='0')then ES <= E14;
 					else ES <= E0; 
 					end if;  
 			when E13=> ES <=Eespera;
@@ -127,7 +126,7 @@ begin
 	LD_X <= '1' when (EP=E1 or EP=E4 or EP=E9 or EP=E14) else '0';
 	LD_Y <= '1' when (EP=E1 or EP=E4 or EP=E9) else '0';
 	LD_COLOUR <= '1' when (EP=E1 or EP=E4) else '0';
-	LD_DIAG <= '1' when (EP=E4 or EP=E9) else '0';
+	LD_DIAG <= '1' when (EP=E4 or EP=E9 or EP=E14 ) else '0';
 	OP_DRAWCOLOUR <= '1' when(EP=E3 or EP=E7 or EP=E12) else '0';
 	OP_SETCURSOR <= '1' when(EP=E2 or EP=E6 or EP=E11) else '0';	
 	BORRAR_DIAGONAL <= '1' when (EP=E3) else '0'; -- tal vez mejor en E1 o en los dos
@@ -174,7 +173,7 @@ begin
 	end process;
 
 --------------------------------------------
---REGISTRO CONTADOR Y
+--REGISTRO CONTADOR FIN DE PROGRAMA
 --------------------------------------------
 	process(CLK,reset)
 	begin
