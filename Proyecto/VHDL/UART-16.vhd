@@ -140,7 +140,7 @@ DATOS <=std_logic_vector(DATOS2);
 	begin
 	if (RESET_DESPL='1'or reset='1') then DATOS2 <=(others=>'0');
    	elsif rising_edge(CLK) then 
-	     	if (DESPLAZAR='1') then DATOS2 <=  DATOS2(15 downto 1 ) & ANADIR;
+	     	if (DESPLAZAR='1') then DATOS2 <=  DATOS2(14 downto 0 ) & ANADIR;
          end if;
 	end if;		  
 	end process;
