@@ -12,13 +12,9 @@ entity UART_16 IS
 
 		--salidas
 		MANDANDO		: out std_logic;
-		DATOS			: out std_logic_vector(15 downto 0);
+		DATOS			: out std_logic_vector(15 downto 0)
 		--estos es para el testbench, borrar despues
-		LD_DIFF2 : out std_logic;
-		PASO2 : out std_logic_vector(4 downto 0);
-		DIFF3 : out std_logic_vector(9 downto 0);
-		A_CARGAR2 : out std_logic_vector(9 downto 0)
-		
+	
 		
 	);
 end UART_16;
@@ -90,6 +86,7 @@ begin
 			when E5 => ES <=E6;
 			when E6 => if(TC_DIFF='1')then ES <=E2; else ES <=E6; end if;
 			when E7 => if(RECIBIDO='1')then ES <=E1; else ES <=E7; end if;
+			
   		end case;
 	end process;
 	
@@ -120,9 +117,8 @@ begin
 	MANDANDO <= '1' when (EP=E7) else '0';
 
 --TRADUCCIONES 
-DATOS <=std_logic_vector(DATOS2);
---OUT_DIFF <=std_logic_vector(OUT_DIFF2);
 
+--OUT_DIFF <=std_logic_vector(OUT_DIFF2);
 
 
 -------------------------------------------------------------------------------------------
@@ -136,14 +132,29 @@ DATOS <=std_logic_vector(DATOS2);
 
 --NOTAS REGISTRO DESPLAZAMIENTO dato(6 downto 0 ) + AVANZAR
 	--registro que desplaza los datos 
-	process(CLK,RESET_DESPL,reset)--TODO ENTERO
+	
+	
+--	process(CLK,RESET_DESPL,reset)--PRIMERO EL BIT DE MAS IMPORTANCIA
+--	begin
+--	if (RESET_DESPL='1'or reset='1') then DATOS2 <=(others=>'0');
+--   	elsif CLK'event AND CLK='1' then 
+--	     	if (DESPLAZAR='1') then DATOS2 <=  DATOS2(14 downto 0 ) & ANADIR;
+--         end if;
+--	end if;		  
+--	end process;
+	
+	
+	
+		process(CLK,RESET_DESPL,reset)--Bit de mas importancia el ultimo
 	begin
 	if (RESET_DESPL='1'or reset='1') then DATOS2 <=(others=>'0');
-   	elsif rising_edge(CLK) then 
-	     	if (DESPLAZAR='1') then DATOS2 <=  DATOS2(14 downto 0 ) & ANADIR;
+   	elsif CLK'event AND CLK='1' then 
+	     	if (DESPLAZAR='1') then DATOS2 <= ANADIR & DATOS2(15 downto 1 )  ;
          end if;
 	end if;		  
 	end process;
+	
+	
 	DATOS<=std_logic_vector(DATOS2);
 	
 --------------------------------------------
@@ -152,15 +163,15 @@ DATOS <=std_logic_vector(DATOS2);
 	process(CLK,reset)
 	begin
 		if (reset='1') then OUT_PASO<= "00000";
-   	elsif rising_edge(CLK) then 
+   	elsif CLK'event AND CLK='1' then 
            	if (DEC_PASO='1') then OUT_PASO <= OUT_PASO - 1;
 	            elsif (LD_PASO ='1') then OUT_PASO <= "10100";
             end if;
 		end if;		  
 	end process;
-	PASO2 <=std_logic_vector(OUT_PASO);
+
 --------------------------------------------
---REGISTRO CONTADOR_DIFF NO CREO QUE FUNCIONE BIEN PERO NO SE PORQUE
+--REGISTRO CONTADOR_DIFF 
 --------------------------------------------
 	process(CLK,reset)
 	begin
@@ -176,11 +187,6 @@ DATOS <=std_logic_vector(DATOS2);
 		end if;		  
 	end process;
 
-	--borrare despues
-	DIFF3<=std_logic_vector(OUT_DIFF);
-	LD_DIFF2 <=LD_DIFF;	
-
-
 	--------------------------------------------
 --MULTIFLEXOR DE X BITS DE ENTRADA Y DOS POSIBLES VALORES
 --------------------------------------------
@@ -189,9 +195,6 @@ DATOS <=std_logic_vector(DATOS2);
 
 		A_CARGAR <= "1010001000" when (YMEDIO='1') else "0110110010";  	--(434/2 +434)-3
 					--434-3
-
---borrameeee
-A_CARGAR2 <= std_logic_vector(A_CARGAR);
 
 
 
