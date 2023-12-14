@@ -13,7 +13,7 @@ entity UART_16 IS
 		--salidas
 		MANDANDO		: out std_logic;
 		esperandoDatos : out std_logic;
-		DATOS			: out std_logic_vector(15 downto 0);
+		DATOS			: out std_logic_vector(15 downto 0)
 		--estos es para el testbench, borrar despues
 
 		
