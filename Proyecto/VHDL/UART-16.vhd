@@ -12,9 +12,10 @@ entity UART_16 IS
 
 		--salidas
 		MANDANDO		: out std_logic;
-		DATOS			: out std_logic_vector(15 downto 0)
+		esperandoDatos : out std_logic;
+		DATOS			: out std_logic_vector(15 downto 0);
 		--estos es para el testbench, borrar despues
-	
+
 		
 	);
 end UART_16;
@@ -22,7 +23,8 @@ end UART_16;
 
 architecture ARCH_UART16 of UART_16 is
 
-	type state is (E1,E2,E3,E4,E5,E6,E7);
+	type state is (E1,E2,E4,E5,E6,E7,Eesperar
+);
 	signal EP,ES: state;
 	--senales internas
 	--Cont_paso
@@ -47,8 +49,6 @@ architecture ARCH_UART16 of UART_16 is
 	signal DATOS2			: unsigned(15 downto 0);
 
 
-	
-
 	--HANSAKE
 begin
 
@@ -72,20 +72,23 @@ begin
                                   		
 	       	   			
 			--ESPERAR HASTA RECIBIR PRIMER RX
-			when E1 => if(RX='0')then ES <=E2;
-				else ES <=E1; 
-				end if;
+			when E1 =>  ES <=E2;
 			--TOCA MIRAR PASO PARA VER QUE HACER A CONTINUACION      			
-			when E2 =>if(OUT_PASO="00001")then ES <=E7;
-						elsif (OUT_PASO = "10100" or OUT_PASO = "01011"or OUT_PASO = "01010") then ES <=E3;-- si 20,11 o 10
-						elsif (RX = '1') then ES <=E4;
-						else ES <=E5;
+			when E2 =>if(OUT_PASO="00000")then ES <=E7;
+						elsif  (OUT_PASO = "10010" or OUT_PASO = "01001") then ES<=Eesperar;--pasos 18  y 9 nos ponemos a esperar a rx
+					--	elsif (OUT_PASO = "01001" or OUT_PASO = "00001") then ES <= Evacio;--paso 10 y en el paso 1 no hay que hacer nada(el bit que hay para leer es de protocolo)
+						elsif (RX = '1')then ES <=E4;
+						else ES <= E5;
 						end if;
-			when E3 => ES <=E6; 
 			when E4 => ES <=E6; 
 			when E5 => ES <=E6;
 			when E6 => if(TC_DIFF='1')then ES <=E2; else ES <=E6; end if;
 			when E7 => if(RECIBIDO='1')then ES <=E1; else ES <=E7; end if;
+			when Eesperar=> if (RX = '0') then ES <=E6;
+							else ES <=Eesperar;
+							end if;
+			--when Evacio  => ES <=E6;
+
 			
   		end case;
 	end process;
@@ -95,8 +98,15 @@ begin
 	--E1
 	RESET_DESPL  <= '1' when (EP=E1) else '0';
 	LD_PASO  <= '1' when (EP=E1) else '0';	
+	esperandoDatos <= '1' when (EP=E1) else '0';
 	
-	YMEDIO<= '1' when (EP=E1 and RX = '0') else '0';
+	--YMEDIO<= '1' when ((EP=Evacio) or (EP=Eesperar)) else '0';
+	YMEDIO<= '1' when ( (EP=Eesperar)) else '0';
+
+	--LD_DIFF <= '1' when ((EP=E6 and TC_DIFF = '1') or  (EP = Eesperar) or  (EP = Evacio)) else '0';	
+	LD_DIFF <= '1' when ((EP=E6 and TC_DIFF = '1') or  (EP = Eesperar) ) else '0';	
+
+
 	--LD_DIFF <=  ESTO ESTA EN EL E6 bien hecho, tiene q estar todo en el mismo
 
 
@@ -107,7 +117,6 @@ begin
 	ANADIR <= '1' when (EP=E4) else '0';
 	--E6	
 
-	LD_DIFF <= '1' when ((EP=E6 and TC_DIFF = '1') or (EP=E1 and RX = '0')) else '0';-- borrado temporalmente OJO ES ESENCIAL
 	DEC_PASO <= '1' when (EP=E6 and TC_DIFF = '1') else '0';
 
 
@@ -162,10 +171,10 @@ begin
 --------------------------------------------
 	process(CLK,reset)
 	begin
-		if (reset='1') then OUT_PASO<= "00000";
+		if (reset='1') then OUT_PASO<= "10010";
    	elsif CLK'event AND CLK='1' then 
-           	if (DEC_PASO='1') then OUT_PASO <= OUT_PASO - 1;
-	            elsif (LD_PASO ='1') then OUT_PASO <= "10100";
+           	if(LD_PASO ='1') then OUT_PASO <= "10010";
+	        elsif  (DEC_PASO='1')  then OUT_PASO <= OUT_PASO - 1 ;
             end if;
 		end if;		  
 	end process;
