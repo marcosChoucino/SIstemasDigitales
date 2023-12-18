@@ -13,9 +13,12 @@ entity UART_16 IS
 		--salidas
 		MANDANDO		: out std_logic;
 		esperandoDatos : out std_logic;
-		DATOS			: out std_logic_vector(15 downto 0)
+		DATOS			: out std_logic_vector(15 downto 0);
 		--estos es para el testbench, borrar despues
+		borrame : out std_logic_vector(4 downto 0);
+	 borrame_OUT_DIFF			: out std_logic_vector(9 downto 0)
 
+	
 		
 	);
 end UART_16;
@@ -96,9 +99,9 @@ begin
 
 	--SENALES LOGICAS, TERMINADOcasi leer abajo
 	--E1
-	RESET_DESPL  <= '1' when (EP=E1) else '0';
+	--RESET_DESPL  <= '1' when (EP=E1) else '0';
 	LD_PASO  <= '1' when (EP=E1) else '0';	
-	esperandoDatos <= '1' when (EP=E1) else '0';
+	esperandoDatos <= '1' when (EP=Eesperar) else '0';
 	
 	--YMEDIO<= '1' when ((EP=Evacio) or (EP=Eesperar)) else '0';
 	YMEDIO<= '1' when ( (EP=Eesperar)) else '0';
@@ -124,6 +127,7 @@ begin
 
 	--E7
 	MANDANDO <= '1' when (EP=E7) else '0';
+	--RESET_DESPL<='1' when (EP=E7 and RECIBIDO = '1') else '0';
 
 --TRADUCCIONES 
 
@@ -154,7 +158,7 @@ begin
 	
 	
 	
-		process(CLK,RESET_DESPL,reset)--Bit de mas importancia el ultimo
+		process(CLK,reset)--Bit de mas importancia el ultimo
 	begin
 	if (RESET_DESPL='1'or reset='1') then DATOS2 <=(others=>'0');
    	elsif CLK'event AND CLK='1' then 
@@ -178,7 +182,7 @@ begin
             end if;
 		end if;		  
 	end process;
-
+	borrame<=std_logic_vector(OUT_PASO);
 --------------------------------------------
 --REGISTRO CONTADOR_DIFF 
 --------------------------------------------
@@ -195,6 +199,7 @@ begin
 			end if;
 		end if;		  
 	end process;
+	borrame_OUT_DIFF <=std_logic_vector(OUT_DIFF);
 
 	--------------------------------------------
 --MULTIFLEXOR DE X BITS DE ENTRADA Y DOS POSIBLES VALORES
@@ -202,7 +207,7 @@ begin
 
 
 
-		A_CARGAR <= "1010001000" when (YMEDIO='1') else "0110110010";  	--(434/2 +434)-3
+		A_CARGAR <= "1010001001" when (YMEDIO='1') else "0110101111";  	--(434/2 +434)-3
 					--434-3
 
 
