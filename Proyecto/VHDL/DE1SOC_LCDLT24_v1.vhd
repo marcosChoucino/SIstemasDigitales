@@ -283,7 +283,7 @@ begin
       NUMPIX       => NUMPIX,
 		
 		--para la uart
-		EntradaUart => datosUart,
+		EntradaUart => datosUart(7 downto 0 )& datosUart(15 downto 8),
 		Handsake => HandsakeFromUARTtoDRAWING,
 		RECIVIDO  => HandsakeFromDRAWINGtoUART
    );
