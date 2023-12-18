@@ -110,12 +110,15 @@ begin
 			when E10 => ES <=E11;
 			when E11=>  if(DONE_CURSOR='1')then ES <= E12;
 					else ES <= E11; --handsake done_cursor_drawfig
-					end if;   
+					end if; 
+			
+			
 			when E12=>  if(DONE_COLOUR='0')then ES <= E12;--handsake done_cursor_drawfig
 				    elsif(TC_DIAG='0')then ES <= E13;
 				    elsif(TC_OUT_Y='0')then ES <= E14;
 					else ES <= E0; 
-					end if;  
+					end if;
+					
 			when E13=> ES <=Eespera;
 			when E14=> ES <=Eespera;
         
@@ -136,7 +139,7 @@ begin
 	LD_UART<= '1' when (EP=E10) else '0';
 	LD_OUT_Y<= '1' when (EP=E9) else '0';
 	INC_OUT_Y<= '1' when (EP=E14) else '0';
-	RECIVIDO<= '1' when (EP=E10) else '0';
+	RECIVIDO<= '1' when EP=E10 else '0';-- añadido estado 11 tambien por si acaso
 	UartM<= '1' when (EP=E12) else '0';
 
 -------------------------------------------------------------------------------------------
