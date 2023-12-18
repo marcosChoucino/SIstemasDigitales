@@ -35,7 +35,7 @@ architecture ARCH_UART16 of UART_16 is
 	signal DEC_PASO		: std_logic;
 	signal OUT_PASO				: unsigned(4 downto 0);
 	--REG_DESPL
-	signal RESET_DESPL		: std_logic;
+--	signal RESET_DESPL		: std_logic;
 	signal ANADIR			: std_logic;
 	signal DESPLAZAR		: std_logic;
 
@@ -160,7 +160,7 @@ begin
 	
 		process(CLK,reset)--Bit de mas importancia el ultimo
 	begin
-	if (RESET_DESPL='1'or reset='1') then DATOS2 <=(others=>'0');
+	if ( reset='1') then DATOS2 <=(others=>'0');
    	elsif CLK'event AND CLK='1' then 
 	     	if (DESPLAZAR='1') then DATOS2 <= ANADIR & DATOS2(15 downto 1 )  ;
          end if;
