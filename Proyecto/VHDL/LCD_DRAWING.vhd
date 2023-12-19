@@ -136,10 +136,10 @@ begin
 	INC_DIAG <= '1' when (EP=E5 or EP=E10) else '0';
 	INC_Y<= '1' when (EP=E8 or EP=E14) else '0';
 	INC_X<= '1' when (EP=E8 or EP=E13) else '0';
-	LD_UART<= '1' when (EP=E10) else '0';
+	LD_UART<= '1' when (EP=Eespera and Handsake = '1') else '0';
 	LD_OUT_Y<= '1' when (EP=E9) else '0';
 	INC_OUT_Y<= '1' when (EP=E14) else '0';
-	RECIVIDO<= '1' when EP=E10 else '0';-- añadido estado 11 tambien por si acaso
+	RECIVIDO<= '1' when EP=E10 else '0';
 	UartM<= '1' when (EP=E12) else '0';
 
 -------------------------------------------------------------------------------------------
