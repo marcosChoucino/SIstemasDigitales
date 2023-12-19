@@ -109,9 +109,8 @@ architecture ARCH_1 of DE1SOC_LCDLT24_v1 is
  
        --salidas
        MANDANDO		: out std_logic;
-       DATOS			: out std_logic_vector(15 downto 0);
-		esperandoDatos : out std_logic
-       
+       DATOS			: out std_logic_vector(15 downto 0)
+
     );
    end component;
     component LCD_CTRL
@@ -167,11 +166,11 @@ architecture ARCH_1 of DE1SOC_LCDLT24_v1 is
 	--para la uart
 	signal HandsakeFromDRAWINGtoUART :  std_logic;
 	signal HandsakeFromUARTtoDRAWING :  std_logic;
-	signal  datosUart        :  std_logic_vector(15 downto 0);
-	signal resetUart :  std_logic;
+	signal  datosUart       			:  std_logic_vector(15 downto 0);
+	signal resetUart 						:  std_logic;
   
   
-  constant  NUMPIXELS        : std_logic_vector(16 downto 0)  := "0" & x"A000";
+  constant  NUMPIXELS        			: std_logic_vector(16 downto 0)  := "0" & x"A000";
   
 begin 
    clk      <= CLOCK_50;
@@ -208,9 +207,11 @@ begin
    LEDR(0)  <= not(KEY(0));--reset
    LEDR(1)  <= not(KEY(1));--uart
    LEDR(2)  <= not(KEY(2));--delscreen
+	LEDR(3)  <= not(KEY(3));--delscreen
 	LEDR(4)  <= DONE_CURSOR; 
-	LEDR(5)  <= DONE_CURSOR;   -- OP_DRAWCOLOUR
-  -- <= not(KEY(3));   -- OP_SETCURSOR
+	LEDR(5)  <= DONE_CURSOR;   
+  -- LED 6 PARA LOS SWICH QUE NO SE USAN
+  LEDR(6)  <= SW(3) OR SW(4) or SW(5) or SW(6) or SW(7) or SW(8) or SW(9);
    LEDR(7)  <=HandsakeFromDRAWINGtoUART;
 	LEDR(8)  <= HandsakeFromUARTtoDRAWING;
    LEDR(9)  <= LT24_Init_Done;
@@ -243,20 +244,18 @@ begin
 
     
 	 
-	  -- LCD_CTRL component instantiation -----------    
+	  -- uart component instantiation -----------    
   myUART: UART_16
    port map (
       CLK     => clk,
       reset   => resetUart,
-		
-				RX => UART_RX,
-				--RECIBIDO => HandsakeFromDRAWINGtoUART,
-				RECIBIDO => HandsakeFromDRAWINGtoUART,
+		--entradas
+		RX => UART_RX,
+		RECIBIDO => HandsakeFromDRAWINGtoUART,
 
 		--salidas
 		MANDANDO		=> HandsakeFromUARTtoDRAWING,
-		DATOS		=> 	datosUart,
-		esperandoDatos =>  LEDR(6) 
+		DATOS		=> 	datosUart
 
    );
     
@@ -283,7 +282,7 @@ begin
       NUMPIX       => NUMPIX,
 		
 		--para la uart
-		EntradaUart => datosUart(7 downto 0 )& datosUart(15 downto 8),
+		EntradaUart => datosUart, -- ¿falla? probar esto:   datosUart (7 downto 0) & datosUart(15 downto 8)
 		Handsake => HandsakeFromUARTtoDRAWING,
 		RECIVIDO  => HandsakeFromDRAWINGtoUART
    );
@@ -354,13 +353,3 @@ END ARCH_1;
 -- 0 al 2 es color
 --el resto sin untilizar
 
-
---leds
--- LEDR(9)  <= LT24_Init_Done;
-
---LEDR(6)  <= not(KEY(3));   -- OP_SETCURSOR
---LEDR(5)  <= not(KEY(2));   -- OP_DRAWCOLOUR
-
--- 1  <= DONE_CURSOR;
---0 <= DONE_COLOUR;
-      
