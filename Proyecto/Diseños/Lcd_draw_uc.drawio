@@ -1,6 +1,6 @@
-<mxfile host="app.diagrams.net" modified="2023-12-11T09:18:12.906Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:120.0) Gecko/20100101 Firefox/120.0" etag="7Np_sgD_8eYWXAafvf9E" version="22.1.7" type="github">
+<mxfile host="app.diagrams.net" modified="2023-12-19T09:27:39.088Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:120.0) Gecko/20100101 Firefox/120.0" etag="aZEHDN_CXc-wBxGlXBKl" version="22.1.11" type="github">
   <diagram name="Página-1" id="ktos8gUdrFeBo976G_Gd">
-    <mxGraphModel dx="1450" dy="589" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+    <mxGraphModel dx="1450" dy="634" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -371,7 +371,7 @@
         <mxCell id="O_03wr08w8RwUqYAejeh-25" value="" style="rhombus;whiteSpace=wrap;html=1;" parent="1" vertex="1">
           <mxGeometry x="790" y="630" width="100" height="50" as="geometry" />
         </mxCell>
-        <mxCell id="O_03wr08w8RwUqYAejeh-26" value="LD_UART&lt;br&gt;INC_DIAG&lt;br&gt;&lt;font color=&quot;#007fff&quot;&gt;RECIVIDO&lt;/font&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
+        <mxCell id="O_03wr08w8RwUqYAejeh-26" value="INC_DIAG&lt;br&gt;&lt;font color=&quot;#007fff&quot;&gt;RECIVIDO&lt;/font&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
           <mxGeometry x="800" y="289" width="70" height="30" as="geometry" />
         </mxCell>
         <mxCell id="O_03wr08w8RwUqYAejeh-27" value="&lt;font style=&quot;font-size: 9px;&quot;&gt;DONE_CURSOR&lt;/font&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
@@ -500,6 +500,9 @@
         </mxCell>
         <mxCell id="O_03wr08w8RwUqYAejeh-84" value="Eespera" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" parent="1" vertex="1">
           <mxGeometry x="936.5" y="215.63" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="tJszzFFagR8c78nVN_P8-1" value="ld_uart" style="ellipse;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="827" y="230" width="60" height="50" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
